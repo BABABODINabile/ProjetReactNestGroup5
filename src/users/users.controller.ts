@@ -31,7 +31,7 @@ export class UsersController {
   @Get()
   async findAll(): Promise<User[]> {
     // On implémentera plus tard la pagination / rôles
-    return [];
+    return this.usersService.findAll();
   }
 
 

@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {Controller,Get,Post,Body,Param,Delete,UseGuards,Req,} from '@nestjs/common';
+import type { Request } from 'express';
+
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Controller('transactions')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('Directeur') // 🔐 accès Directeur uniquement
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  async create(
+    @Body() dto: CreateTransactionDto,
+    @Req() req: Request,
+  ) {
+    return this.transactionsService.create(dto, req.user as User);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.transactionsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionsService.update(+id, updateTransactionDto);
-  }
-
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.transactionsService.remove(+id);
   }
 }
