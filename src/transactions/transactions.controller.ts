@@ -1,4 +1,4 @@
-import {Controller,Get,Post,Body,Param,Delete,UseGuards,Req,} from '@nestjs/common';
+import {Controller,Get,Post,Patch,Body,Param,Delete,UseGuards,Req,Query} from '@nestjs/common';
 import type { Request } from 'express';
 
 import { TransactionsService } from './transactions.service';
@@ -24,13 +24,23 @@ export class TransactionsController {
   }
 
   @Get()
-  async findAll() {
-    return this.transactionsService.findAll();
+  async findAll(@Query() query: any) {
+    // query contiendra { page, limit, type, etc. }
+    return this.transactionsService.findAll(query);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(+id);
+  }
+
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateTransactionDto>,
+  ) {
+    return this.transactionsService.update(+id, dto);
   }
 
   @Delete(':id')

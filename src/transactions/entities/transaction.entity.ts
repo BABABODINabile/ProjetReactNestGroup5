@@ -22,7 +22,14 @@ export class Transaction {
   })
   category: Category;
 
-  @Column('decimal', { precision: 15, scale: 2 })
+  @Column('decimal', { 
+    precision: 15, 
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   amount: number;
 
   @Column({ type: 'text', nullable: true })
