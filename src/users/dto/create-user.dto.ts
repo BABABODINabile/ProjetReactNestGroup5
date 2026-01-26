@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import {IsEmail,IsNotEmpty,IsString,MinLength,IsBoolean,IsOptional,IsInt} from 'class-validator';
+import {IsEmail,IsNotEmpty,IsString,MinLength,IsBoolean,IsOptional,IsInt, IsNumber} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -20,8 +20,8 @@ export class CreateUserDto {
   password: string;
 
   @Type(() => Number)
-  @IsInt()
-  @IsNotEmpty()
+  @IsNumber()
+  @IsNotEmpty({message: 'Le rôle est obligatoire'})
   role_id: number;
 
   @IsOptional()

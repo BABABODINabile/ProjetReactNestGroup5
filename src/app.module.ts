@@ -17,7 +17,7 @@ import { AuthModule } from './auth/auth.module';
       password: '',
       database: 'projetReactNestgroupe5',
       autoLoadEntities: true,
-      synchronize: true, // On devra le garder uniquement en dev
+      synchronize: true,
     }),
     AuthModule,
     UsersModule,

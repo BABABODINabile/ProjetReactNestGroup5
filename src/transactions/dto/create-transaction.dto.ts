@@ -1,4 +1,4 @@
-import {IsEnum,IsNotEmpty,IsNumber,IsOptional,IsPositive,IsString,IsDateString,} from 'class-validator';
+import {IsEnum,IsNotEmpty,IsNumber,IsOptional,IsPositive,IsString,IsDateString, Max,} from 'class-validator';
 import { CategoryType } from 'src/categories/category-type.enum';
 
 export enum TransactionType {
@@ -18,6 +18,7 @@ export class CreateTransactionDto {
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
+  @Max(Number.MAX_SAFE_INTEGER)
   amount: number;
 
   @IsOptional()

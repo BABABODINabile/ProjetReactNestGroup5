@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { Role } from '../roles/entities/role.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -76,5 +77,71 @@ export class UsersService {
   }
 
   return user;
-}
+  }
+
+
+  async update(id: number, dto: Partial<CreateUserDto>): Promise<User> {
+    const user = await this.findById(id);
+
+    if (dto.email && dto.email !== user.email) {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: dto.email },
+      });
+      if (existingUser) {
+        throw new BadRequestException('Email déjà utilisé');
+      }
+      user.email = dto.email;
+    }
+
+    if (dto.firstname) {
+      user.firstname = dto.firstname;
+    }
+
+    if (dto.name) {
+      user.name = dto.name;
+    }
+
+    if (dto.password) {
+      user.password = await bcrypt.hash(dto.password, 10);
+    }
+
+    if (dto.role_id) {
+      const role = await this.roleRepository.findOne({
+        where: { id: dto.role_id },
+      });
+      if (!role) {
+        throw new BadRequestException('Rôle invalide');
+      }
+      user.role = role;
+    }
+
+    if (dto.is_active !== undefined) {
+      user.is_active = dto.is_active;
+    }
+
+    return await this.userRepository.save(user);
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.userRepository.delete(id);
+  }
+
+
+  async changePassword(userId: number, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    // 1. Vérifier si l'ancien mot de passe est correct
+    const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
+    if (!isMatch) {
+      throw new BadRequestException('Ancien mot de passe incorrect');
+    }
+
+    // 2. Hasher le nouveau mot de passe
+    const salt = await bcrypt.genSalt();
+    user.password = await bcrypt.hash(dto.newPassword, salt);
+
+    // 3. Sauvegarder
+    await this.userRepository.save(user);
+  }
 }

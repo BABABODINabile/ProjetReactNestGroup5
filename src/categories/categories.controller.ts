@@ -8,7 +8,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('categories')
-//@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 //@Roles('DIRECTEUR') // seul le directeur gère les catégories
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
