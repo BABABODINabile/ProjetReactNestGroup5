@@ -45,6 +45,27 @@ import { CategoryType } from 'src/categories/category-type.enum';
       user,
     });
 
+    // Calcul du solde global actuel
+    const balanceRaw = await this.transactionRepository
+      .createQueryBuilder('t')
+      .select(
+        "SUM(CASE WHEN t.type = 'Recette' THEN t.amount ELSE -t.amount END)",
+        'totalBalance',
+      )
+      .getRawOne();
+
+    const currentBalance = Number(balanceRaw?.totalBalance) || 0;
+
+    // Effet de la nouvelle transaction
+    const effect = dto.type === 'Recette' ? dto.amount : -dto.amount;
+    const newBalance = currentBalance + effect;
+
+    if (newBalance < 100000) {
+      throw new BadRequestException(
+        'Transaction interdite : le solde global serait inférieur à 100000',
+      );
+    }
+
     return await this.transactionRepository.save(transaction);
   }
 
@@ -130,6 +151,32 @@ import { CategoryType } from 'src/categories/category-type.enum';
       if (dto.amount) transaction.amount = dto.amount;
       if (dto.description !== undefined) transaction.description = dto.description;
       if (dto.transaction_date) transaction.transaction_date = new Date(dto.transaction_date);
+
+      // Vérification du solde global après modification
+      // Calculer le solde courant global
+      const balanceRaw = await this.transactionRepository
+        .createQueryBuilder('t')
+        .select(
+          "SUM(CASE WHEN t.type = 'Recette' THEN t.amount ELSE -t.amount END)",
+          'totalBalance',
+        )
+        .getRawOne();
+
+      const currentBalance = Number(balanceRaw?.totalBalance) || 0;
+
+      // Effet ancien et nouvel effet de la transaction
+      const oldEffect = transaction.type === 'Recette' ? transaction.amount : -transaction.amount;
+      const newType = dto.type || transaction.type;
+      const newAmount = dto.amount !== undefined ? dto.amount : transaction.amount;
+      const newEffect = newType === 'Recette' ? newAmount : -newAmount;
+
+      const resultingBalance = currentBalance - oldEffect + newEffect;
+
+      if (resultingBalance < 100000) {
+        throw new BadRequestException(
+          'Modification interdite : le solde global serait inférieur à 100000',
+        );
+      }
 
       return await this.transactionRepository.save(transaction);
     }
