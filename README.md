@@ -153,11 +153,6 @@ Les tests sont gérés par Jest. Commandes :
 3. Commits clairs et tests
 4. PR vers `main` avec description et screenshots si nécessaire
 
-## Améliorations proposées
-
-- Ajouter Swagger (OpenAPI) pour documenter l'API automatiquement
-- Ajouter un script de migration avec TypeORM
-- Ajouter un conteneur Docker (Dockerfile + docker-compose) pour faciliter l'installation locale
 
 ## Licence
 
