@@ -25,74 +25,148 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+# ProjetGroupe5 - API NestJS
+
+## Description
+
+API backend développée avec NestJS pour le projet de groupe 5. Ce dépôt contient l'implémentation des modules principaux suivants :
+
+- Auth (JWT)
+- Users
+- Roles
+- Categories
+- Transactions
+- Attachements
+
+Le projet utilise TypeORM avec MySQL et bcrypt pour le hachage des mots de passe.
+
+## Tech stack
+
+- Node.js + TypeScript
+- NestJS
+- TypeORM
+- MySQL (via mysql2)
+- JWT (via @nestjs/jwt)
+
+## Prérequis
+
+- Node.js 18+ (ou version recommandée compatible avec les dépendances)
+- npm
+- Une base de données MySQL accessible
+
+## Installation
+
+1. Cloner le dépôt
+
+   git clone <repo-url>
+
+2. Installer les dépendances
+
+   npm install
+
+3. Créer un fichier d'environnement (ex : `.env`) à la racine et définir les variables nécessaires (exemples ci-dessous).
+
+### Variables d'environnement recommandées
+
+- DATABASE_HOST=localhost
+- DATABASE_PORT=3306
+- DATABASE_USER=root
+- DATABASE_PASS=changeme
+- DATABASE_NAME=projetgroupe5
+- JWT_SECRET=une_clef_secrete
+- JWT_EXPIRES_IN=3600s
+
+## Configuration et base de données
+
+Le projet utilise TypeORM. Assurez-vous que la base de données existe et que les informations de connexion dans les variables d'environnement sont correctes. Si vous avez des migrations dans le projet, exécutez-les ; sinon TypeORM peut synchroniser le schéma si configuré (attention en production).
+
+## Commandes utiles (npm scripts)
+
+- `npm install`           # installer les dépendances
+- `npm run start`         # lancer en production (ou via `node dist/main` après build)
+- `npm run start:dev`     # lancer en mode développement (watch)
+- `npm run build`         # compiler TypeScript dans /dist
+- `npm run lint`          # lancer ESLint et corriger
+- `npm run test`          # lancer les tests unitaires
+- `npm run test:e2e`      # exécuter les tests end-to-end
+- `npm run test:cov`      # coverage
+
+## Structure du projet
+
+Les dossiers principaux sont dans `src/` :
+
+- `auth/` — login, jwt strategy, guards
+- `users/` — gestion des utilisateurs
+- `roles/` — gestion des rôles
+- `categories/` — catégories et leur type
+- `transactions/` — création et gestion des transactions
+- `attachements/` — fichiers/attachements
+
+## Endpoints principaux (exemples)
+
+Les routes peuvent dépendre du préfixe configuré dans `main.ts`. Voici des endpoints courants (adapter selon le contrôleur) :
+
+- `POST /auth/login` — authentification (retourne JWT)
+- `GET /users` — lister les utilisateurs (auth + rôle)
+- `POST /users` — créer utilisateur
+- `PATCH /users/:id` — mettre à jour
+- `GET /roles` — gérer les rôles
+- `GET /categories` — lister catégories
+- `POST /transactions` — créer transaction (auth)
+- `POST /attachements` — uploader un fichier
+
+## Authentification
+
+L'API utilise JWT. Exemple d'usage avec curl :
+
+1) Obtenir le token
 
 ```bash
-$ npm install
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"password"}'
 ```
 
-## Compile and run the project
+2) Appeler un endpoint protégé
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/users
 ```
 
-## Run tests
+## Tests
 
-```bash
-# unit tests
-$ npm run test
+Les tests sont gérés par Jest. Commandes :
 
-# e2e tests
-$ npm run test:e2e
+- `npm run test`        # tests unitaires
+- `npm run test:e2e`    # tests end-to-end (configuration dans `test/jest-e2e.json`)
 
-# test coverage
-$ npm run test:cov
-```
+## Bonnes pratiques
 
-## Deployment
+- Ne jamais mettre `JWT_SECRET` en clair dans le repo. Utiliser `.env` ou un secret manager.
+- Configurer la production pour ne pas utiliser `synchronize: true` dans TypeORM.
+- Ajouter une CI (GitHub Actions / GitLab CI) pour lancer lint et tests.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Contribution
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+1. Fork & clone
+2. Créer une branche feature/fix : `git checkout -b feat/ma-fonctionnalite`
+3. Commits clairs et tests
+4. PR vers `main` avec description et screenshots si nécessaire
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+## Améliorations proposées
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Ajouter Swagger (OpenAPI) pour documenter l'API automatiquement
+- Ajouter un script de migration avec TypeORM
+- Ajouter un conteneur Docker (Dockerfile + docker-compose) pour faciliter l'installation locale
 
-## Resources
+## Licence
 
-Check out a few resources that may come in handy when working with NestJS:
+Le champ `license` dans `package.json` est `UNLICENSED`. Si vous souhaitez ouvrir le code, choisissez une licence (MIT, Apache-2.0, etc.) et mettez à jour `package.json` et ce fichier.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Contact
 
-## Support
+Pour toute question, ouvrez une issue dans ce dépôt ou contactez l'auteur du projet.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Fait le: 04 février 2026
